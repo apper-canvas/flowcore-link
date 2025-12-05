@@ -57,7 +57,7 @@ class ProductService {
     return true;
   }
 
-  async getLowStockProducts() {
+async getLowStockProducts() {
     await this.delay();
     return this.products.filter(p => p.stockLevel <= p.reorderPoint);
   }
@@ -65,6 +65,27 @@ class ProductService {
   async getByCategory(category) {
     await this.delay();
     return this.products.filter(p => p.category.toLowerCase() === category.toLowerCase());
+  }
+
+  async getProfitMargins() {
+    await this.delay();
+    return this.products.map(product => {
+      // Calculate cost (assuming 60% of price is cost for demo purposes)
+      const estimatedCost = product.price * 0.6;
+      const profit = product.price - estimatedCost;
+      const marginPercentage = (profit / product.price) * 100;
+      
+      return {
+        Id: product.Id,
+        name: product.name,
+        category: product.category,
+        price: product.price,
+        estimatedCost: estimatedCost,
+        profit: profit,
+        marginPercentage: marginPercentage,
+        stockLevel: product.stockLevel
+      };
+    }).sort((a, b) => b.marginPercentage - a.marginPercentage);
   }
 
   getNextId() {

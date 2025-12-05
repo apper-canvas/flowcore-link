@@ -7,8 +7,8 @@ const Inventory = lazy(() => import("@/components/pages/Inventory"));
 const Orders = lazy(() => import("@/components/pages/Orders"));
 const Customers = lazy(() => import("@/components/pages/Customers"));
 const Financials = lazy(() => import("@/components/pages/Financials"));
+const AdvancedReports = lazy(() => import("@/components/pages/AdvancedReports"));
 const NotFound = lazy(() => import("@/components/pages/NotFound"));
-
 const LoadingSuspense = ({ children }) => (
   <Suspense fallback={
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -42,10 +42,14 @@ const mainRoutes = [
   {
     path: "customers",
     element: <LoadingSuspense><Customers /></LoadingSuspense>
-  },
+},
   {
     path: "financials",
     element: <LoadingSuspense><Financials /></LoadingSuspense>
+  },
+  {
+    path: "financials/reports", 
+    element: <LoadingSuspense><AdvancedReports /></LoadingSuspense>
   },
   {
     path: "*",

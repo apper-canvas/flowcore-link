@@ -197,8 +197,7 @@ const Financials = () => {
       </div>
     );
   }
-
-  const categories = [...new Set(transactions.map(t => t.category))];
+const categories = [...new Set(transactions.map(t => t.category))];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -208,10 +207,20 @@ const Financials = () => {
           <h1 className="text-3xl font-bold text-gray-900">Financial Management</h1>
           <p className="mt-2 text-gray-600">Track income, expenses, and financial performance</p>
         </div>
-        <Button onClick={handleAddTransaction} className="mt-4 sm:mt-0">
-          <ApperIcon name="Plus" className="w-4 h-4 mr-2" />
-          Record Transaction
-        </Button>
+        <div className="flex gap-3 mt-4 sm:mt-0">
+          <Button 
+            variant="outline" 
+            onClick={() => window.open('/financials/reports', '_blank')}
+            className="hidden sm:flex"
+          >
+            <ApperIcon name="BarChart3" className="w-4 h-4 mr-2" />
+            Advanced Reports
+          </Button>
+          <Button onClick={handleAddTransaction}>
+            <ApperIcon name="Plus" className="w-4 h-4 mr-2" />
+            Record Transaction
+          </Button>
+        </div>
       </div>
 
       {/* Financial Summary */}
