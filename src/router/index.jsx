@@ -43,11 +43,15 @@ const mainRoutes = [
     element: <LoadingSuspense><Orders /></LoadingSuspense>
   },
   {
+    path: "sales-orders",
+    element: <LoadingSuspense><Orders /></LoadingSuspense>
+  },
+  {
     path: "customers",
     element: <LoadingSuspense><Customers /></LoadingSuspense>
-},
+  },
   {
-path: "financials",
+    path: "financials",
     element: <LoadingSuspense><Financials /></LoadingSuspense>
   },
   {

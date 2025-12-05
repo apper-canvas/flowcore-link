@@ -1,39 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import DataTable from "@/components/organisms/DataTable";
-import OrderModal from "@/components/organisms/OrderModal";
-import InvoicePDFModal from "@/components/organisms/InvoicePDFModal";
-import SearchBar from "@/components/molecules/SearchBar";
-import StatusBadge from "@/components/molecules/StatusBadge";
-import Button from "@/components/atoms/Button";
-import Select from "@/components/atoms/Select";
+import { format } from "date-fns";
+import orderService from "@/services/api/orderService";
+import customerService from "@/services/api/customerService";
+import ApperIcon from "@/components/ApperIcon";
 import Loading from "@/components/ui/Loading";
 import ErrorView from "@/components/ui/ErrorView";
 import Empty from "@/components/ui/Empty";
-import ApperIcon from "@/components/ApperIcon";
-import orderService from "@/services/api/orderService";
-import customerService from "@/services/api/customerService";
-import { format } from "date-fns";
+import Select from "@/components/atoms/Select";
+import Button from "@/components/atoms/Button";
+import InvoicePDFModal from "@/components/organisms/InvoicePDFModal";
+import OrderModal from "@/components/organisms/OrderModal";
+import DataTable from "@/components/organisms/DataTable";
+import SearchBar from "@/components/molecules/SearchBar";
+import StatusBadge from "@/components/molecules/StatusBadge";
 
 const Orders = () => {
-  const [orders, setOrders] = useState([]);
+const [salesOrders, setSalesOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState(null);
+  const [activeTab, setActiveTab] = useState("orders");
+
   useEffect(() => {
     loadData();
   }, []);
 
   useEffect(() => {
     filterOrders();
-  }, [orders, searchQuery, statusFilter]);
+  }, [salesOrders, searchQuery, statusFilter]);
 
   const loadData = async () => {
     setLoading(true);
@@ -41,28 +43,28 @@ const [selectedOrder, setSelectedOrder] = useState(null);
     
     try {
       const [ordersData, customersData] = await Promise.all([
-        orderService.getAll(),
+        orderService.getSalesOrders(),
         customerService.getAll()
       ]);
-      setOrders(ordersData);
+      setSalesOrders(ordersData);
       setCustomers(customersData);
     } catch (err) {
-      setError("Failed to load orders");
-      console.error("Orders error:", err);
+      setError("Failed to load sales orders");
+      console.error("Sales Orders error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   const filterOrders = () => {
-    let filtered = [...orders];
+    let filtered = [...salesOrders];
 
     // Search filter
     if (searchQuery) {
       filtered = filtered.filter(order => {
-        const customer = customers.find(c => c.Id === order.customerId);
+        const customer = customers.find(c => c.Id === order.customer_id);
         return (
-          order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          order.sales_order_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
           customer?.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
       });
@@ -79,34 +81,36 @@ const [selectedOrder, setSelectedOrder] = useState(null);
   const handleSaveOrder = async (orderData) => {
     try {
       if (selectedOrder) {
-        await orderService.update(selectedOrder.Id, orderData);
-        const updatedOrders = orders.map(o =>
-          o.Id === selectedOrder.Id ? { ...o, ...orderData } : o
+        await orderService.updateSalesOrder(selectedOrder.sales_order_id, orderData);
+        const updatedOrders = salesOrders.map(o =>
+          o.sales_order_id === selectedOrder.sales_order_id ? { ...o, ...orderData } : o
         );
-        setOrders(updatedOrders);
+        setSalesOrders(updatedOrders);
       } else {
-        const newOrder = await orderService.create(orderData);
-        setOrders([...orders, newOrder]);
+        const newOrder = await orderService.createSalesOrder(orderData);
+        setSalesOrders([...salesOrders, newOrder]);
       }
       setIsModalOpen(false);
       setSelectedOrder(null);
+      toast.success(selectedOrder ? "Sales order updated successfully" : "Sales order created successfully");
     } catch (error) {
       throw error;
     }
   };
 
   const handleDeleteOrder = async (order) => {
-    if (window.confirm(`Are you sure you want to delete order ${order.orderNumber}?`)) {
+    if (window.confirm(`Are you sure you want to delete sales order ${order.sales_order_number}?`)) {
       try {
-        await orderService.delete(order.Id);
-        setOrders(orders.filter(o => o.Id !== order.Id));
-        toast.success("Order deleted successfully");
+        await orderService.deleteSalesOrder(order.sales_order_id);
+        setSalesOrders(salesOrders.filter(o => o.sales_order_id !== order.sales_order_id));
+        toast.success("Sales order deleted successfully");
       } catch (error) {
-        toast.error("Failed to delete order");
+        toast.error("Failed to delete sales order");
       }
     }
   };
-const handleEditOrder = (order) => {
+
+  const handleEditOrder = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
@@ -116,20 +120,46 @@ const handleEditOrder = (order) => {
     setIsModalOpen(true);
   };
 
-  const handleGenerateInvoice = (order) => {
-    setSelectedOrderForInvoice(order);
-    setIsInvoiceModalOpen(true);
+  const handleGenerateInvoice = async (order) => {
+    try {
+      const invoice = await orderService.createInvoiceFromOrder(order.sales_order_id);
+      toast.success(`Invoice ${invoice.invoice_number} created successfully`);
+      
+      // Update order status to invoiced
+      await handleStatusChange(order, 'invoiced');
+      
+      setSelectedOrderForInvoice(order);
+      setIsInvoiceModalOpen(true);
+    } catch (error) {
+      toast.error("Failed to create invoice");
+    }
   };
+
+  const handleCreateDeliveryNote = async (order) => {
+    try {
+      const deliveryNote = await orderService.createDeliveryNote(order.sales_order_id, {
+        warehouse_id: 1, // Default warehouse
+        delivery_date: new Date().toISOString()
+      });
+      toast.success(`Delivery note created successfully`);
+      
+      // Update order status to delivered
+      await handleStatusChange(order, 'delivered');
+    } catch (error) {
+      toast.error("Failed to create delivery note");
+    }
+  };
+
   const handleStatusChange = async (order, newStatus) => {
     try {
-      const updatedOrder = await orderService.update(order.Id, { status: newStatus });
-      const updatedOrders = orders.map(o =>
-        o.Id === order.Id ? updatedOrder : o
+      const updatedOrder = await orderService.updateSalesOrder(order.sales_order_id, { status: newStatus });
+      const updatedOrders = salesOrders.map(o =>
+        o.sales_order_id === order.sales_order_id ? updatedOrder : o
       );
-      setOrders(updatedOrders);
-      toast.success(`Order status updated to ${newStatus}`);
+      setSalesOrders(updatedOrders);
+      toast.success(`Sales order status updated to ${newStatus}`);
     } catch (error) {
-      toast.error("Failed to update order status");
+      toast.error("Failed to update sales order status");
     }
   };
 
@@ -138,10 +168,22 @@ const handleEditOrder = (order) => {
     return customer ? customer.name : "Unknown Customer";
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'delivered': return 'bg-purple-100 text-purple-800';
+      case 'invoiced': return 'bg-green-100 text-green-800';
+      case 'paid': return 'bg-emerald-100 text-emerald-800';
+      case 'cancelled': return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   const columns = [
-    { key: "orderNumber", label: "Order #", sortable: true },
+    { key: "sales_order_number", label: "Sales Order #", sortable: true },
     { 
-      key: "customerId", 
+      key: "customer_id", 
       label: "Customer", 
       sortable: true,
       render: (value) => getCustomerName(value)
@@ -149,23 +191,33 @@ const handleEditOrder = (order) => {
     {
       key: "status",
       label: "Status",
-      render: (value) => <StatusBadge status={value} type="order" />
+      render: (value) => (
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(value)}`}>
+          {value.charAt(0).toUpperCase() + value.slice(1)}
+        </span>
+      )
     },
     { 
-      key: "total", 
-      label: "Total", 
+      key: "total_amount", 
+      label: "Total Amount", 
       sortable: true,
       render: (value) => `$${value.toFixed(2)}`
     },
     { 
-      key: "createdAt", 
-      label: "Date", 
+      key: "order_date", 
+      label: "Order Date", 
       sortable: true,
       render: (value) => format(new Date(value), "MMM dd, yyyy")
     },
+    { 
+      key: "delivery_date", 
+      label: "Delivery Date", 
+      sortable: true,
+      render: (value) => value ? format(new Date(value), "MMM dd, yyyy") : "-"
+    },
     {
       key: "actions",
-label: "Actions",
+      label: "Actions",
       render: (value, order) => (
         <div className="flex items-center gap-2">
           <Select
@@ -175,10 +227,22 @@ label: "Actions",
           >
             <option value="pending">Pending</option>
             <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
+            <option value="delivered">Delivered</option>
+            <option value="invoiced">Invoiced</option>
+            <option value="paid">Paid</option>
             <option value="cancelled">Cancelled</option>
           </Select>
-          {order.status === 'completed' && (
+          {(order.status === 'processing') && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleCreateDeliveryNote(order)}
+              title="Create Delivery Note"
+            >
+              <ApperIcon name="Truck" className="w-4 h-4" />
+            </Button>
+          )}
+          {(order.status === 'delivered') && (
             <Button
               variant="ghost"
               size="sm"
@@ -229,74 +293,59 @@ label: "Actions",
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order Management</h1>
-          <p className="mt-2 text-gray-600">Track and manage customer orders</p>
+          <h1 className="text-3xl font-bold text-gray-900">Sales Order Management</h1>
+          <p className="mt-2 text-gray-600">Complete order-to-cash workflow management</p>
         </div>
         <Button onClick={handleAddOrder} className="mt-4 sm:mt-0">
           <ApperIcon name="Plus" className="w-4 h-4 mr-2" />
-          Create Order
+          Create Sales Order
         </Button>
-      </div>
-
-      {/* Order Status Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {["pending", "processing", "completed", "cancelled"].map(status => {
-          const count = orders.filter(o => o.status === status).length;
-          return (
-            <div key={status} className="card p-4 text-center">
-              <div className="text-2xl font-bold text-gray-900 mb-1">{count}</div>
-              <div className="text-sm text-gray-600 capitalize">{status}</div>
-            </div>
-          );
-        })}
       </div>
 
       {/* Filters */}
       <div className="card p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <SearchBar
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search orders by number or customer name..."
+              onChange={setSearchQuery}
+              placeholder="Search by order number or customer..."
             />
           </div>
-          
           <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full sm:w-48"
           >
-            <option value="">All Status</option>
+            <option value="">All Statuses</option>
             <option value="pending">Pending</option>
             <option value="processing">Processing</option>
-            <option value="completed">Completed</option>
+            <option value="delivered">Delivered</option>
+            <option value="invoiced">Invoiced</option>
+            <option value="paid">Paid</option>
             <option value="cancelled">Cancelled</option>
           </Select>
         </div>
       </div>
 
-      {/* Orders Table */}
-      {filteredOrders.length === 0 && !loading ? (
-        <Empty
-          title="No orders found"
-          description={searchQuery || statusFilter 
-            ? "Try adjusting your filters to see more orders"
-            : "Get started by creating your first order"
-          }
-          actionLabel="Create Order"
-          onAction={handleAddOrder}
-          icon="ShoppingCart"
-        />
-      ) : (
-        <DataTable
-          data={filteredOrders}
-          columns={columns}
-          loading={loading}
-          onRowClick={handleEditOrder}
-        />
-      )}
+      {/* Sales Orders Table */}
+      <div className="card">
+        {filteredOrders.length === 0 ? (
+          <Empty 
+            title="No Sales Orders Found"
+            description="Get started by creating your first sales order."
+          />
+        ) : (
+          <DataTable
+            data={filteredOrders}
+            columns={columns}
+            loading={loading}
+            searchable={false}
+          />
+        )}
+      </div>
 
-{/* Order Modal */}
+      {/* Sales Order Modal */}
       <OrderModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -305,6 +354,7 @@ label: "Actions",
         }}
         order={selectedOrder}
         onSave={handleSaveOrder}
+        isSalesOrder={true}
       />
 
       {/* Invoice PDF Modal */}

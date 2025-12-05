@@ -11,7 +11,7 @@ const InvoicePDFModal = ({ isOpen, onClose, order }) => {
   const [apperClient, setApperClient] = useState(null);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && order) {
       initializeApperClient();
       loadCustomerData();
     }
@@ -58,16 +58,16 @@ const InvoicePDFModal = ({ isOpen, onClose, order }) => {
 
     setLoading(true);
 
-    try {
+try {
       const invoiceData = {
         order: {
-          id: order.Id,
-          orderNumber: order.orderNumber,
-          date: order.createdAt,
+          id: order.sales_order_id || order.Id,
+          orderNumber: order.sales_order_number || order.orderNumber,
+          date: order.order_date || order.createdAt,
           status: order.status,
           subtotal: order.subtotal || 0,
           tax: order.tax || 0,
-          total: order.total || 0,
+          total: order.total_amount || order.total || 0,
           items: order.items || [],
           notes: order.notes || ""
         },
@@ -80,7 +80,7 @@ const InvoicePDFModal = ({ isOpen, onClose, order }) => {
         },
         company: {
           name: "FlowCore ERP",
-          address: "123 Business St, Suite 100",
+          address: "123 Business St, Suite 100", 
           city: "Business City, BC 12345",
           phone: "(555) 123-4567",
           email: "info@flowcore.com"
@@ -140,12 +140,12 @@ const InvoicePDFModal = ({ isOpen, onClose, order }) => {
             </div>
           ) : (
             <>
-              <div className="mb-6">
+<div className="mb-6">
                 <h3 className="font-medium text-gray-900 mb-2">Invoice Details</h3>
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p>Order: {order?.orderNumber}</p>
+                  <p>Sales Order: {order?.sales_order_number || order?.orderNumber}</p>
                   <p>Customer: {customer?.name || "Loading..."}</p>
-                  <p>Total: ${order?.total?.toFixed(2) || "0.00"}</p>
+                  <p>Total: ${(order?.total_amount || order?.total)?.toFixed(2) || "0.00"}</p>
                 </div>
               </div>
 

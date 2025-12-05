@@ -23,8 +23,8 @@ class TransactionService {
     const newTransaction = {
       Id: this.getNextId(),
       ...transactionData,
-      date: new Date().toISOString(),
-relatedOrderId: transactionData.relatedOrderId || null
+date: new Date().toISOString(),
+      relatedOrderId: transactionData.relatedOrderId || null
     };
     this.transactions.push(newTransaction);
     
