@@ -11,11 +11,14 @@ import ErrorView from "@/components/ui/ErrorView";
 import Empty from "@/components/ui/Empty";
 import ApperIcon from "@/components/ApperIcon";
 import transactionService from "@/services/api/transactionService";
+import chartOfAccountsService from "@/services/api/chartOfAccountsService";
 import { format } from "date-fns";
 
 const Financials = () => {
   const [transactions, setTransactions] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [trialBalance, setTrialBalance] = useState([]);
   const [summary, setSummary] = useState({ totalIncome: 0, totalExpenses: 0, netIncome: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,26 +27,32 @@ const Financials = () => {
   const [categoryFilter, setCategoryFilter] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("transactions");
 
   useEffect(() => {
-    loadTransactions();
+    loadFinancialData();
   }, []);
 
   useEffect(() => {
     filterTransactions();
   }, [transactions, searchQuery, typeFilter, categoryFilter]);
 
-  const loadTransactions = async () => {
+  const loadFinancialData = async () => {
     setLoading(true);
     setError("");
     
     try {
-      const [transactionsData, summaryData] = await Promise.all([
+      const [transactionsData, summaryData, accountsData, trialBalanceData] = await Promise.all([
         transactionService.getAll(),
-        transactionService.getSummary()
+        transactionService.getSummary(),
+        chartOfAccountsService.getAll(),
+        chartOfAccountsService.getTrialBalance()
       ]);
+      
       setTransactions(transactionsData);
       setSummary(summaryData);
+      setAccounts(accountsData);
+      setTrialBalance(trialBalanceData);
     } catch (err) {
       setError("Failed to load financial data");
       console.error("Financials error:", err);
@@ -55,7 +64,6 @@ const Financials = () => {
   const filterTransactions = () => {
     let filtered = [...transactions];
 
-    // Search filter
     if (searchQuery) {
       filtered = filtered.filter(transaction =>
         transaction.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -63,12 +71,10 @@ const Financials = () => {
       );
     }
 
-    // Type filter
     if (typeFilter) {
       filtered = filtered.filter(transaction => transaction.type === typeFilter);
     }
 
-    // Category filter
     if (categoryFilter) {
       filtered = filtered.filter(transaction => transaction.category === categoryFilter);
     }
@@ -89,7 +95,6 @@ const Financials = () => {
         setTransactions([...transactions, newTransaction]);
       }
       
-      // Refresh summary
       const newSummary = await transactionService.getSummary();
       setSummary(newSummary);
       
@@ -106,7 +111,6 @@ const Financials = () => {
         await transactionService.delete(transaction.Id);
         setTransactions(transactions.filter(t => t.Id !== transaction.Id));
         
-        // Refresh summary
         const newSummary = await transactionService.getSummary();
         setSummary(newSummary);
         
@@ -127,7 +131,14 @@ const Financials = () => {
     setIsModalOpen(true);
   };
 
-  const columns = [
+  // Calculate chart of accounts summary
+  const assetAccounts = accounts.filter(acc => acc.account_type === "Asset");
+  const liabilityAccounts = accounts.filter(acc => acc.account_type === "Liability");
+  const equityAccounts = accounts.filter(acc => acc.account_type === "Equity");
+  const revenueAccounts = accounts.filter(acc => acc.account_type === "Revenue");
+  const expenseAccounts = accounts.filter(acc => acc.account_type === "Expense");
+
+  const transactionColumns = [
     { 
       key: "date", 
       label: "Date", 
@@ -182,6 +193,24 @@ const Financials = () => {
     }
   ];
 
+  const trialBalanceColumns = [
+    { key: "account_code", label: "Account Code", sortable: true },
+    { key: "account_name", label: "Account Name", sortable: true },
+    { key: "account_type", label: "Type", sortable: true },
+    { 
+      key: "debit_balance", 
+      label: "Debit Balance", 
+      render: (value) => value > 0 ? `$${value.toFixed(2)}` : "-"
+    },
+    { 
+      key: "credit_balance", 
+      label: "Credit Balance", 
+      render: (value) => value > 0 ? `$${value.toFixed(2)}` : "-"
+    }
+  ];
+
+  const categories = [...new Set(transactions.map(t => t.category))];
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -193,11 +222,10 @@ const Financials = () => {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <ErrorView message={error} onRetry={loadTransactions} />
+        <ErrorView message={error} onRetry={loadFinancialData} />
       </div>
     );
   }
-const categories = [...new Set(transactions.map(t => t.category))];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -205,7 +233,7 @@ const categories = [...new Set(transactions.map(t => t.category))];
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Financial Management</h1>
-          <p className="mt-2 text-gray-600">Track income, expenses, and financial performance</p>
+          <p className="mt-2 text-gray-600">Track transactions, accounts, and financial performance</p>
         </div>
         <div className="flex gap-3 mt-4 sm:mt-0">
           <Button 
@@ -224,104 +252,186 @@ const categories = [...new Set(transactions.map(t => t.category))];
       </div>
 
       {/* Financial Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <MetricCard
-          title="Total Income"
-          value={`$${summary.totalIncome.toLocaleString()}`}
+          title="Total Assets"
+          value={assetAccounts.length.toString()}
           icon="TrendingUp"
-          trend="+12.5%"
+          trend="Accounts"
           trendDirection="up"
         />
         <MetricCard
-          title="Total Expenses"
-          value={`$${summary.totalExpenses.toLocaleString()}`}
+          title="Total Liabilities"
+          value={liabilityAccounts.length.toString()}
           icon="TrendingDown"
-          trend="+8.2%"
+          trend="Accounts"
           trendDirection="down"
         />
         <MetricCard
-          title="Net Income"
-          value={`$${summary.netIncome.toLocaleString()}`}
+          title="Revenue Accounts"
+          value={revenueAccounts.length.toString()}
           icon="DollarSign"
-          trend={summary.netIncome >= 0 ? "+15.3%" : "-8.7%"}
-          trendDirection={summary.netIncome >= 0 ? "up" : "down"}
+          trend="Active"
+          trendDirection="up"
+        />
+        <MetricCard
+          title="Expense Accounts"
+          value={expenseAccounts.length.toString()}
+          icon="Calculator"
+          trend="Active"
+          trendDirection="neutral"
         />
       </div>
 
-      {/* Profit & Loss Summary */}
+      {/* Chart of Accounts Overview */}
       <div className="card p-6 mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Profit & Loss Summary</h3>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-700">Total Revenue</span>
-            <span className="font-semibold text-success">+${summary.totalIncome.toFixed(2)}</span>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Chart of Accounts Overview</h3>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-1">Assets</div>
+            <div className="text-2xl font-bold text-blue-600">{assetAccounts.length}</div>
+            <div className="text-xs text-gray-600">Accounts</div>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-700">Total Expenses</span>
-            <span className="font-semibold text-error">-${summary.totalExpenses.toFixed(2)}</span>
+          <div className="p-4 bg-red-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-1">Liabilities</div>
+            <div className="text-2xl font-bold text-red-600">{liabilityAccounts.length}</div>
+            <div className="text-xs text-gray-600">Accounts</div>
           </div>
-          <hr />
-          <div className="flex justify-between items-center text-lg">
-            <span className="font-semibold text-gray-900">Net Profit/Loss</span>
-            <span className={`font-bold ${summary.netIncome >= 0 ? "text-success" : "text-error"}`}>
-              ${summary.netIncome.toFixed(2)}
-            </span>
+          <div className="p-4 bg-purple-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-1">Equity</div>
+            <div className="text-2xl font-bold text-purple-600">{equityAccounts.length}</div>
+            <div className="text-xs text-gray-600">Accounts</div>
+          </div>
+          <div className="p-4 bg-green-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-1">Revenue</div>
+            <div className="text-2xl font-bold text-green-600">{revenueAccounts.length}</div>
+            <div className="text-xs text-gray-600">Accounts</div>
+          </div>
+          <div className="p-4 bg-orange-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-1">Expenses</div>
+            <div className="text-2xl font-bold text-orange-600">{expenseAccounts.length}</div>
+            <div className="text-xs text-gray-600">Accounts</div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="card p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <SearchBar
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search transactions by description or category..."
-            />
-          </div>
-          
-          <Select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="">All Types</option>
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </Select>
-          
-          <Select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-          >
-            <option value="">All Categories</option>
-            {categories.map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </Select>
+      {/* Tabs */}
+      <div className="card mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="-mb-px flex space-x-8 px-6">
+            <button
+              onClick={() => setActiveTab("transactions")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "transactions"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Transactions
+            </button>
+            <button
+              onClick={() => setActiveTab("trial-balance")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "trial-balance"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Trial Balance
+            </button>
+          </nav>
+        </div>
+
+        <div className="p-6">
+          {activeTab === "transactions" && (
+            <>
+              {/* Transaction Filters */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="md:col-span-2">
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search transactions by description or category..."
+                  />
+                </div>
+                
+                <Select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                >
+                  <option value="">All Types</option>
+                  <option value="income">Income</option>
+                  <option value="expense">Expense</option>
+                </Select>
+                
+                <Select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(category => (
+                    <option key={category} value={category}>{category}</option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* Transactions Table */}
+              {filteredTransactions.length === 0 && !loading ? (
+                <Empty
+                  title="No transactions found"
+                  description={searchQuery || typeFilter || categoryFilter 
+                    ? "Try adjusting your filters to see more transactions"
+                    : "Get started by recording your first transaction"
+                  }
+                  actionLabel="Record Transaction"
+                  onAction={handleAddTransaction}
+                  icon="FileText"
+                />
+              ) : (
+                <DataTable
+                  data={filteredTransactions}
+                  columns={transactionColumns}
+                  loading={loading}
+                  onRowClick={handleEditTransaction}
+                />
+              )}
+            </>
+          )}
+
+          {activeTab === "trial-balance" && (
+            <>
+              <div className="mb-4">
+                <h4 className="text-lg font-medium text-gray-900">Trial Balance</h4>
+                <p className="text-gray-600">Current balances for all accounts</p>
+              </div>
+              
+              <DataTable
+                data={trialBalance}
+                columns={trialBalanceColumns}
+                loading={loading}
+              />
+              
+              {/* Trial Balance Totals */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium">Total Debits: </span>
+                    <span className="text-blue-600">
+                      ${trialBalance.reduce((sum, acc) => sum + (acc.debit_balance || 0), 0).toFixed(2)}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="font-medium">Total Credits: </span>
+                    <span className="text-blue-600">
+                      ${trialBalance.reduce((sum, acc) => sum + (acc.credit_balance || 0), 0).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </div>
-
-      {/* Transactions Table */}
-      {filteredTransactions.length === 0 && !loading ? (
-        <Empty
-          title="No transactions found"
-          description={searchQuery || typeFilter || categoryFilter 
-            ? "Try adjusting your filters to see more transactions"
-            : "Get started by recording your first transaction"
-          }
-          actionLabel="Record Transaction"
-          onAction={handleAddTransaction}
-          icon="FileText"
-        />
-      ) : (
-        <DataTable
-          data={filteredTransactions}
-          columns={columns}
-          loading={loading}
-          onRowClick={handleEditTransaction}
-        />
-      )}
 
       {/* Transaction Modal */}
       <TransactionModal

@@ -1,0 +1,82 @@
+[
+  {
+    "Id": 1,
+    "je_line_id": 1,
+    "je_id": 1,
+    "account_id": 1,
+    "debit": 50000.00,
+    "credit": 0.00
+  },
+  {
+    "Id": 2,
+    "je_line_id": 2,
+    "je_id": 1,
+    "account_id": 11,
+    "debit": 0.00,
+    "credit": 50000.00
+  },
+  {
+    "Id": 3,
+    "je_line_id": 3,
+    "je_id": 2,
+    "account_id": 5,
+    "debit": 15000.00,
+    "credit": 0.00
+  },
+  {
+    "Id": 4,
+    "je_line_id": 4,
+    "je_id": 2,
+    "account_id": 1,
+    "debit": 0.00,
+    "credit": 15000.00
+  },
+  {
+    "Id": 5,
+    "je_line_id": 5,
+    "je_id": 3,
+    "account_id": 1,
+    "debit": 25000.00,
+    "credit": 0.00
+  },
+  {
+    "Id": 6,
+    "je_line_id": 6,
+    "je_id": 3,
+    "account_id": 13,
+    "debit": 0.00,
+    "credit": 25000.00
+  },
+  {
+    "Id": 7,
+    "je_line_id": 7,
+    "je_id": 4,
+    "account_id": 18,
+    "debit": 2000.00,
+    "credit": 0.00
+  },
+  {
+    "Id": 8,
+    "je_line_id": 8,
+    "je_id": 4,
+    "account_id": 1,
+    "debit": 0.00,
+    "credit": 2000.00
+  },
+  {
+    "Id": 9,
+    "je_line_id": 9,
+    "je_id": 5,
+    "account_id": 22,
+    "debit": 500.00,
+    "credit": 0.00
+  },
+  {
+    "Id": 10,
+    "je_line_id": 10,
+    "je_id": 5,
+    "account_id": 6,
+    "debit": 0.00,
+    "credit": 500.00
+  }
+]

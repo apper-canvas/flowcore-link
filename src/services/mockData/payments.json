@@ -1,0 +1,42 @@
+[
+  {
+    "Id": 1,
+    "payment_id": 1,
+    "invoice_id": 1001,
+    "payment_date": "2024-01-20",
+    "amount_paid": 15000.00,
+    "payment_method": "Check"
+  },
+  {
+    "Id": 2,
+    "payment_id": 2,
+    "invoice_id": 1002,
+    "payment_date": "2024-01-22",
+    "amount_paid": 8500.00,
+    "payment_method": "Bank Transfer"
+  },
+  {
+    "Id": 3,
+    "payment_id": 3,
+    "invoice_id": 1003,
+    "payment_date": "2024-01-25",
+    "amount_paid": 3200.00,
+    "payment_method": "Credit Card"
+  },
+  {
+    "Id": 4,
+    "payment_id": 4,
+    "invoice_id": 2001,
+    "payment_date": "2024-01-18",
+    "amount_paid": 5500.00,
+    "payment_method": "ACH"
+  },
+  {
+    "Id": 5,
+    "payment_id": 5,
+    "invoice_id": 2002,
+    "payment_date": "2024-01-28",
+    "amount_paid": 12000.00,
+    "payment_method": "Wire Transfer"
+  }
+]

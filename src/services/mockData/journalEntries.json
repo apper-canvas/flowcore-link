@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 1,
+    "je_number": "JE001",
+    "je_date": "2024-01-15",
+    "description": "Initial cash investment"
+  },
+  {
+    "Id": 2,
+    "je_number": "JE002",
+    "je_date": "2024-01-16",
+    "description": "Purchase of office equipment"
+  },
+  {
+    "Id": 3,
+    "je_number": "JE003",
+    "je_date": "2024-01-20",
+    "description": "Sales revenue for January"
+  },
+  {
+    "Id": 4,
+    "je_number": "JE004",
+    "je_date": "2024-01-25",
+    "description": "Payment of rent for January"
+  },
+  {
+    "Id": 5,
+    "je_number": "JE005",
+    "je_date": "2024-01-31",
+    "description": "Monthly depreciation expense"
+  }
+]

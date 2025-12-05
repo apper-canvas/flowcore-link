@@ -13,6 +13,7 @@ const navigationItems = [
     { name: "Purchase Orders", href: "/purchase-orders", icon: "Truck" },
     { name: "Customers", href: "/customers", icon: "Users" },
     { name: "Financials", href: "/financials", icon: "DollarSign" },
+    { name: "Journal Entries", href: "/journal-entries", icon: "BookOpen" },
     { name: "Activity Log", href: "/activity-log", icon: "Activity" }
   ];
 

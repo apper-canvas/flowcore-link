@@ -7,6 +7,7 @@ const Inventory = lazy(() => import("@/components/pages/Inventory"));
 const Orders = lazy(() => import("@/components/pages/Orders"));
 const Customers = lazy(() => import("@/components/pages/Customers"));
 const Financials = lazy(() => import("@/components/pages/Financials"));
+const JournalEntries = lazy(() => import("@/components/pages/JournalEntries"));
 const AdvancedReports = lazy(() => import("@/components/pages/AdvancedReports"));
 const ActivityLog = lazy(() => import("@/components/pages/ActivityLog"));
 const PurchaseOrders = lazy(() => import("@/components/pages/PurchaseOrders"));
@@ -46,14 +47,18 @@ const mainRoutes = [
     element: <LoadingSuspense><Customers /></LoadingSuspense>
 },
   {
-    path: "financials",
+path: "financials",
     element: <LoadingSuspense><Financials /></LoadingSuspense>
+  },
+  {
+    path: "journal-entries",
+    element: <LoadingSuspense><JournalEntries /></LoadingSuspense>
   },
   {
     path: "activity-log",
     element: <LoadingSuspense><ActivityLog /></LoadingSuspense>
   },
-{
+  {
     path: "financials/reports", 
     element: <LoadingSuspense><AdvancedReports /></LoadingSuspense>
   },
