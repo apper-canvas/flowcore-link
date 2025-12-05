@@ -25,13 +25,27 @@ const StatusBadge = ({ status, type = "stock" }) => {
         case "completed":
           return { variant: "success", label: "Completed" };
         case "cancelled":
+case "cancelled":
           return { variant: "default", label: "Cancelled" };
         default:
           return { variant: "default", label: status || "Unknown" };
       }
     }
     
-    return { variant: "default", label: status || "Unknown" };
+    if (type === "purchase-order") {
+      switch (status?.toLowerCase()) {
+        case "draft":
+          return { variant: "default", label: "Draft" };
+        case "ordered":
+          return { variant: "info", label: "Ordered" };
+        case "received":
+          return { variant: "success", label: "Received" };
+        case "cancelled":
+          return { variant: "error", label: "Cancelled" };
+        default:
+          return { variant: "default", label: status || "Unknown" };
+      }
+    }
   };
 
   const { variant, label } = getStatusConfig();

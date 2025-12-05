@@ -1,0 +1,81 @@
+[
+  {
+    "Id": 1,
+    "poNumber": "PO-001234",
+    "supplierId": 1,
+    "status": "ordered",
+    "orderDate": "2024-11-15T10:00:00Z",
+    "expectedDate": "2024-11-25T10:00:00Z",
+    "receivedDate": null,
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Wireless Bluetooth Headphones",
+        "quantity": 50,
+        "unitCost": 45.00,
+        "total": 2250.00
+      },
+      {
+        "productId": 2,
+        "productName": "Smartphone Case",
+        "quantity": 100,
+        "unitCost": 8.50,
+        "total": 850.00
+      }
+    ],
+    "subtotal": 3100.00,
+    "tax": 248.00,
+    "total": 3348.00,
+    "notes": "Rush order - need by month end",
+    "createdAt": "2024-11-15T10:00:00Z",
+    "updatedAt": "2024-11-15T10:00:00Z"
+  },
+  {
+    "Id": 2,
+    "poNumber": "PO-001235",
+    "supplierId": 2,
+    "status": "received",
+    "orderDate": "2024-11-10T14:30:00Z",
+    "expectedDate": "2024-11-20T14:30:00Z",
+    "receivedDate": "2024-11-18T09:15:00Z",
+    "items": [
+      {
+        "productId": 3,
+        "productName": "Gaming Mouse",
+        "quantity": 25,
+        "unitCost": 32.00,
+        "total": 800.00
+      }
+    ],
+    "subtotal": 800.00,
+    "tax": 64.00,
+    "total": 864.00,
+    "notes": "Standard delivery",
+    "createdAt": "2024-11-10T14:30:00Z",
+    "updatedAt": "2024-11-18T09:15:00Z"
+  },
+  {
+    "Id": 3,
+    "poNumber": "PO-001236",
+    "supplierId": 3,
+    "status": "draft",
+    "orderDate": null,
+    "expectedDate": null,
+    "receivedDate": null,
+    "items": [
+      {
+        "productId": 4,
+        "productName": "Portable Charger",
+        "quantity": 75,
+        "unitCost": 15.00,
+        "total": 1125.00
+      }
+    ],
+    "subtotal": 1125.00,
+    "tax": 90.00,
+    "total": 1215.00,
+    "notes": "Draft order - pending approval",
+    "createdAt": "2024-11-20T16:00:00Z",
+    "updatedAt": "2024-11-20T16:00:00Z"
+  }
+]

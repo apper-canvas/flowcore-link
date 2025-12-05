@@ -142,6 +142,24 @@ async getLowStockProducts() {
     }).sort((a, b) => b.marginPercentage - a.marginPercentage);
   }
 
+async updateStock(productId, quantity, operation = 'add') {
+    await this.delay();
+    const index = this.products.findIndex(p => p.Id === parseInt(productId));
+    if (index === -1) {
+      throw new Error("Product not found");
+    }
+    
+    const product = this.products[index];
+    if (operation === 'add') {
+      product.stockLevel += quantity;
+    } else if (operation === 'subtract') {
+      product.stockLevel = Math.max(0, product.stockLevel - quantity);
+    }
+    
+    product.updatedAt = new Date().toISOString();
+    return { ...product };
+  }
+
   getNextId() {
     return Math.max(...this.products.map(p => p.Id), 0) + 1;
   }

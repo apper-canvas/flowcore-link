@@ -1,0 +1,54 @@
+[
+  {
+    "Id": 1,
+    "name": "ABC Supply Co.",
+    "contactName": "John Smith",
+    "email": "john@abcsupply.com",
+    "phone": "555-0123",
+    "address": "123 Industrial Blvd, City, ST 12345",
+    "paymentTerms": "Net 30",
+    "status": "active",
+    "rating": 4.5,
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "name": "Global Parts Inc.",
+    "contactName": "Sarah Johnson",
+    "email": "sarah@globalparts.com",
+    "phone": "555-0456",
+    "address": "456 Commerce Ave, City, ST 12346",
+    "paymentTerms": "Net 15",
+    "status": "active",
+    "rating": 4.8,
+    "createdAt": "2024-01-20T14:15:00Z",
+    "updatedAt": "2024-01-20T14:15:00Z"
+  },
+  {
+    "Id": 3,
+    "name": "Tech Components Ltd.",
+    "contactName": "Mike Chen",
+    "email": "mike@techcomponents.com",
+    "phone": "555-0789",
+    "address": "789 Tech Park Dr, City, ST 12347",
+    "paymentTerms": "Net 45",
+    "status": "active",
+    "rating": 4.2,
+    "createdAt": "2024-02-01T09:45:00Z",
+    "updatedAt": "2024-02-01T09:45:00Z"
+  },
+  {
+    "Id": 4,
+    "name": "Premium Materials Corp.",
+    "contactName": "Lisa Brown",
+    "email": "lisa@premiummaterials.com",
+    "phone": "555-0234",
+    "address": "234 Material St, City, ST 12348",
+    "paymentTerms": "Net 30",
+    "status": "inactive",
+    "rating": 3.9,
+    "createdAt": "2024-02-10T11:20:00Z",
+    "updatedAt": "2024-02-10T11:20:00Z"
+  }
+]

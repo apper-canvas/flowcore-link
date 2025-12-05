@@ -12,6 +12,7 @@ const navigationItems = [
     { name: "Dashboard", href: "/", icon: "BarChart3" },
     { name: "Inventory", href: "/inventory", icon: "Package" },
     { name: "Orders", href: "/orders", icon: "ShoppingCart" },
+    { name: "Purchase Orders", href: "/purchase-orders", icon: "Truck" },
     { name: "Customers", href: "/customers", icon: "Users" },
     { name: "Financials", href: "/financials", icon: "DollarSign" },
     { name: "Activity Log", href: "/activity-log", icon: "Activity" }
