@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import DataTable from "@/components/organisms/DataTable";
 import OrderModal from "@/components/organisms/OrderModal";
+import InvoicePDFModal from "@/components/organisms/InvoicePDFModal";
 import SearchBar from "@/components/molecules/SearchBar";
 import StatusBadge from "@/components/molecules/StatusBadge";
 import Button from "@/components/atoms/Button";
@@ -22,9 +23,10 @@ const Orders = () => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState(null);
+const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [selectedOrderForInvoice, setSelectedOrderForInvoice] = useState(null);
   useEffect(() => {
     loadData();
   }, []);
@@ -104,8 +106,7 @@ const Orders = () => {
       }
     }
   };
-
-  const handleEditOrder = (order) => {
+const handleEditOrder = (order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
@@ -115,6 +116,10 @@ const Orders = () => {
     setIsModalOpen(true);
   };
 
+  const handleGenerateInvoice = (order) => {
+    setSelectedOrderForInvoice(order);
+    setIsInvoiceModalOpen(true);
+  };
   const handleStatusChange = async (order, newStatus) => {
     try {
       const updatedOrder = await orderService.update(order.Id, { status: newStatus });
@@ -160,7 +165,7 @@ const Orders = () => {
     },
     {
       key: "actions",
-      label: "Actions",
+label: "Actions",
       render: (value, order) => (
         <div className="flex items-center gap-2">
           <Select
@@ -173,6 +178,16 @@ const Orders = () => {
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </Select>
+          {order.status === 'completed' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleGenerateInvoice(order)}
+              title="Generate Invoice"
+            >
+              <ApperIcon name="FileText" className="w-4 h-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"
@@ -281,7 +296,7 @@ const Orders = () => {
         />
       )}
 
-      {/* Order Modal */}
+{/* Order Modal */}
       <OrderModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -290,6 +305,16 @@ const Orders = () => {
         }}
         order={selectedOrder}
         onSave={handleSaveOrder}
+      />
+
+      {/* Invoice PDF Modal */}
+      <InvoicePDFModal
+        isOpen={isInvoiceModalOpen}
+        onClose={() => {
+          setIsInvoiceModalOpen(false);
+          setSelectedOrderForInvoice(null);
+        }}
+        order={selectedOrderForInvoice}
       />
     </div>
   );
