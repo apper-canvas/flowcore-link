@@ -52,13 +52,12 @@ relatedOrderId: transactionData.relatedOrderId || null
     return { ...this.transactions[index] };
   }
 
-  async delete(id) {
+async delete(id) {
     await this.delay();
     const index = this.transactions.findIndex(t => t.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Transaction not found");
     }
-}
     
     const deletedTransaction = { ...this.transactions[index] };
     this.transactions.splice(index, 1);
