@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import ApperIcon from "@/components/ApperIcon";
-import SearchBar from "@/components/molecules/SearchBar";
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -18,17 +16,6 @@ const navigationItems = [
     { name: "Activity Log", href: "/activity-log", icon: "Activity" }
   ];
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // In a real app, this would perform global search
-      console.log("Searching for:", searchQuery);
-    }
-  };
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
@@ -76,16 +63,6 @@ const navigationItems = [
             ))}
           </nav>
 
-          {/* Search Bar */}
-          <div className="hidden md:block max-w-sm w-full">
-            <form onSubmit={handleSearchSubmit}>
-              <SearchBar
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Search products, orders, customers..."
-              />
-            </form>
-          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -103,14 +80,7 @@ const navigationItems = [
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-gray-200 bg-white">
-          <div className="px-4 py-2">
-            <form onSubmit={handleSearchSubmit} className="mb-4">
-              <SearchBar
-                value={searchQuery}
-                onChange={handleSearch}
-                placeholder="Search..."
-              />
-            </form>
+<div className="px-4 py-2">
             <nav className="space-y-1">
               {navigationItems.map((item) => (
                 <NavLink
