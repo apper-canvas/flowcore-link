@@ -1,0 +1,221 @@
+[
+  {
+    "Id": 1,
+    "timestamp": "2024-01-15T14:30:25.123Z",
+    "userId": "user_001",
+    "username": "John Admin",
+    "action": "CREATE",
+    "entityType": "Customer",
+    "entityId": 5,
+    "entityName": "Acme Corporation",
+    "description": "Created new customer record for Acme Corporation",
+    "details": {
+      "email": "contact@acme.com",
+      "phone": "+1-555-0123"
+    },
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 2,
+    "timestamp": "2024-01-15T14:25:15.456Z",
+    "userId": "user_002",
+    "username": "Sarah Manager",
+    "action": "UPDATE",
+    "entityType": "Order",
+    "entityId": 12,
+    "entityName": "Order #ORD-12-2024",
+    "description": "Updated order status from 'pending' to 'processing'",
+    "details": {
+      "previousStatus": "pending",
+      "newStatus": "processing",
+      "orderTotal": 1249.99
+    },
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 3,
+    "timestamp": "2024-01-15T14:20:30.789Z",
+    "userId": "user_001",
+    "username": "John Admin",
+    "action": "CREATE",
+    "entityType": "Product",
+    "entityId": 8,
+    "entityName": "Wireless Bluetooth Headphones",
+    "description": "Added new product to inventory",
+    "details": {
+      "sku": "WBH-2024-01",
+      "price": 79.99,
+      "stockLevel": 150,
+      "category": "Electronics"
+    },
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 4,
+    "timestamp": "2024-01-15T14:15:45.321Z",
+    "userId": "user_003",
+    "username": "Mike Accountant",
+    "action": "CREATE",
+    "entityType": "Transaction",
+    "entityId": 25,
+    "entityName": "Office Supplies Purchase",
+    "description": "Recorded expense transaction for office supplies",
+    "details": {
+      "type": "expense",
+      "category": "Office Supplies",
+      "amount": 234.56
+    },
+    "ipAddress": "192.168.1.102",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 5,
+    "timestamp": "2024-01-15T14:10:12.654Z",
+    "userId": "user_002",
+    "username": "Sarah Manager",
+    "action": "DELETE",
+    "entityType": "Customer",
+    "entityId": 3,
+    "entityName": "Inactive Corp",
+    "description": "Deleted customer record for Inactive Corp",
+    "details": {
+      "reason": "Customer requested account deletion",
+      "lastOrderDate": "2023-12-01T00:00:00.000Z"
+    },
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 6,
+    "timestamp": "2024-01-15T14:05:33.987Z",
+    "userId": "user_001",
+    "username": "John Admin",
+    "action": "UPDATE",
+    "entityType": "Product",
+    "entityId": 5,
+    "entityName": "Smart Watch Pro",
+    "description": "Updated product stock level and price",
+    "details": {
+      "previousPrice": 299.99,
+      "newPrice": 279.99,
+      "previousStock": 25,
+      "newStock": 45
+    },
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 7,
+    "timestamp": "2024-01-15T14:00:18.147Z",
+    "userId": "user_003",
+    "username": "Mike Accountant",
+    "action": "UPDATE",
+    "entityType": "Transaction",
+    "entityId": 23,
+    "entityName": "Sales Revenue - January",
+    "description": "Updated transaction amount and category",
+    "details": {
+      "previousAmount": 5000.00,
+      "newAmount": 5250.00,
+      "previousCategory": "Sales",
+      "newCategory": "Product Sales"
+    },
+    "ipAddress": "192.168.1.102",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 8,
+    "timestamp": "2024-01-15T13:55:42.258Z",
+    "userId": "user_002",
+    "username": "Sarah Manager",
+    "action": "CREATE",
+    "entityType": "Order",
+    "entityId": 15,
+    "entityName": "Order #ORD-15-2024",
+    "description": "Created new order for customer Tech Solutions Inc",
+    "details": {
+      "customerId": 7,
+      "customerName": "Tech Solutions Inc",
+      "orderTotal": 2199.97,
+      "itemCount": 3
+    },
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 9,
+    "timestamp": "2024-01-15T13:50:27.369Z",
+    "userId": "system",
+    "username": "System User",
+    "action": "SYSTEM",
+    "entityType": "Backup",
+    "entityId": null,
+    "entityName": "Daily Database Backup",
+    "description": "Automated daily database backup completed successfully",
+    "details": {
+      "backupSize": "156.7 MB",
+      "duration": "2.3 seconds",
+      "recordsBackedUp": 1247
+    },
+    "ipAddress": "127.0.0.1",
+    "userAgent": "System/1.0"
+  },
+  {
+    "Id": 10,
+    "timestamp": "2024-01-15T13:45:11.741Z",
+    "userId": "user_001",
+    "username": "John Admin",
+    "action": "DELETE",
+    "entityType": "Product",
+    "entityId": 2,
+    "entityName": "Discontinued Widget",
+    "description": "Removed discontinued product from inventory",
+    "details": {
+      "reason": "Product discontinuation",
+      "finalStockLevel": 0,
+      "lastSaleDate": "2023-11-15T00:00:00.000Z"
+    },
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  },
+  {
+    "Id": 11,
+    "timestamp": "2024-01-15T13:40:55.852Z",
+    "userId": "user_002",
+    "username": "Sarah Manager",
+    "action": "UPDATE",
+    "entityType": "Customer",
+    "entityId": 9,
+    "entityName": "Global Enterprises LLC",
+    "description": "Updated customer contact information and address",
+    "details": {
+      "previousEmail": "old@global.com",
+      "newEmail": "contact@globalent.com",
+      "addressChanged": true
+    },
+    "ipAddress": "192.168.1.101",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+  },
+  {
+    "Id": 12,
+    "timestamp": "2024-01-15T13:35:38.963Z",
+    "userId": "user_003",
+    "username": "Mike Accountant",
+    "action": "CREATE",
+    "entityType": "Transaction",
+    "entityId": 28,
+    "entityName": "Monthly Rent Payment",
+    "description": "Recorded monthly office rent expense",
+    "details": {
+      "type": "expense",
+      "category": "Rent",
+      "amount": 3500.00,
+      "recurring": true
+    },
+    "ipAddress": "192.168.1.102",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+  }
+]

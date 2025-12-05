@@ -5,6 +5,7 @@ const Button = forwardRef(({
   className, 
   variant = "primary", 
   size = "md",
+  loading = false,
   children, 
   ...props 
 }, ref) => {
@@ -25,13 +26,14 @@ const Button = forwardRef(({
     lg: "px-6 py-3 text-base rounded-lg"
   };
   
-  return (
+return (
     <button
       className={cn(baseClasses, variants[variant], sizes[size], className)}
       ref={ref}
+      disabled={loading || props.disabled}
       {...props}
     >
-      {children}
+      {loading ? "Loading..." : children}
     </button>
   );
 });

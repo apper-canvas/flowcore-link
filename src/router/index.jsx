@@ -8,6 +8,7 @@ const Orders = lazy(() => import("@/components/pages/Orders"));
 const Customers = lazy(() => import("@/components/pages/Customers"));
 const Financials = lazy(() => import("@/components/pages/Financials"));
 const AdvancedReports = lazy(() => import("@/components/pages/AdvancedReports"));
+const ActivityLog = lazy(() => import("@/components/pages/ActivityLog"));
 const NotFound = lazy(() => import("@/components/pages/NotFound"));
 const LoadingSuspense = ({ children }) => (
   <Suspense fallback={
@@ -46,6 +47,10 @@ const mainRoutes = [
   {
     path: "financials",
     element: <LoadingSuspense><Financials /></LoadingSuspense>
+  },
+  {
+    path: "activity-log",
+    element: <LoadingSuspense><ActivityLog /></LoadingSuspense>
   },
   {
     path: "financials/reports", 

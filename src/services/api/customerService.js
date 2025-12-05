@@ -1,4 +1,5 @@
 import mockData from "../mockData/customers.json";
+import activityLogService from "./activityLogService";
 
 class CustomerService {
   constructor() {
@@ -26,9 +27,25 @@ class CustomerService {
       ...customerData,
       totalOrders: 0,
       totalSpent: 0,
-      createdAt: new Date().toISOString()
+createdAt: new Date().toISOString()
     };
     this.customers.push(newCustomer);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "CREATE",
+      entityType: "Customer",
+      entityId: newCustomer.Id,
+      entityName: newCustomer.name,
+      description: `Created new customer record for ${newCustomer.name}`,
+      details: {
+        email: newCustomer.email,
+        phone: newCustomer.phone
+      }
+    });
+    
     return { ...newCustomer };
   }
 
@@ -37,25 +54,58 @@ class CustomerService {
     const index = this.customers.findIndex(c => c.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Customer not found");
-    }
+}
     
+    const oldCustomer = { ...this.customers[index] };
     this.customers[index] = {
       ...this.customers[index],
       ...customerData,
       Id: parseInt(id)
     };
     
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "UPDATE",
+      entityType: "Customer",
+      entityId: parseInt(id),
+      entityName: this.customers[index].name,
+      description: `Updated customer information for ${this.customers[index].name}`,
+      details: {
+        previousName: oldCustomer.name,
+        newName: this.customers[index].name,
+        emailChanged: oldCustomer.email !== this.customers[index].email
+      }
+    });
     return { ...this.customers[index] };
   }
 
   async delete(id) {
-    await this.delay();
+await this.delay();
     const index = this.customers.findIndex(c => c.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Customer not found");
     }
     
+    const deletedCustomer = { ...this.customers[index] };
     this.customers.splice(index, 1);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "DELETE",
+      entityType: "Customer",
+      entityId: parseInt(id),
+      entityName: deletedCustomer.name,
+      description: `Deleted customer record for ${deletedCustomer.name}`,
+      details: {
+        lastEmail: deletedCustomer.email,
+        deletionReason: "User requested deletion"
+      }
+    });
+    
     return true;
   }
 

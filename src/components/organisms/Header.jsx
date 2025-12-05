@@ -8,12 +8,13 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  const navigationItems = [
+const navigationItems = [
     { name: "Dashboard", href: "/", icon: "BarChart3" },
     { name: "Inventory", href: "/inventory", icon: "Package" },
     { name: "Orders", href: "/orders", icon: "ShoppingCart" },
     { name: "Customers", href: "/customers", icon: "Users" },
-    { name: "Financials", href: "/financials", icon: "DollarSign" }
+    { name: "Financials", href: "/financials", icon: "DollarSign" },
+    { name: "Activity Log", href: "/activity-log", icon: "Activity" }
   ];
 
   const handleSearch = (e) => {

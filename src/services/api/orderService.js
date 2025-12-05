@@ -1,4 +1,5 @@
 import mockData from "../mockData/orders.json";
+import activityLogService from "./activityLogService";
 
 class OrderService {
   constructor() {
@@ -28,17 +29,34 @@ class OrderService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
-    this.orders.push(newOrder);
+this.orders.push(newOrder);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_002",
+      username: "Current User",
+      action: "CREATE",
+      entityType: "Order",
+      entityId: newOrder.Id,
+      entityName: newOrder.orderNumber,
+      description: `Created new order ${newOrder.orderNumber}`,
+      details: {
+        customerId: newOrder.customerId,
+        orderTotal: newOrder.total,
+        itemCount: newOrder.items?.length || 0
+      }
+    });
+    
     return { ...newOrder };
   }
-
   async update(id, orderData) {
     await this.delay();
     const index = this.orders.findIndex(o => o.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Order not found");
-    }
+}
     
+    const oldOrder = { ...this.orders[index] };
     this.orders[index] = {
       ...this.orders[index],
       ...orderData,
@@ -46,17 +64,51 @@ class OrderService {
       updatedAt: new Date().toISOString()
     };
     
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_002",
+      username: "Current User",
+      action: "UPDATE",
+      entityType: "Order",
+      entityId: parseInt(id),
+      entityName: this.orders[index].orderNumber,
+      description: `Updated order ${this.orders[index].orderNumber}`,
+      details: {
+        previousStatus: oldOrder.status,
+        newStatus: this.orders[index].status,
+        previousTotal: oldOrder.total,
+        newTotal: this.orders[index].total
+      }
+    });
+    
     return { ...this.orders[index] };
   }
 
   async delete(id) {
     await this.delay();
-    const index = this.orders.findIndex(o => o.Id === parseInt(id));
+const index = this.orders.findIndex(o => o.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Order not found");
     }
     
+    const deletedOrder = { ...this.orders[index] };
     this.orders.splice(index, 1);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_002",
+      username: "Current User",
+      action: "DELETE",
+      entityType: "Order",
+      entityId: parseInt(id),
+      entityName: deletedOrder.orderNumber,
+      description: `Deleted order ${deletedOrder.orderNumber}`,
+      details: {
+        orderTotal: deletedOrder.total,
+        deletionReason: "User requested deletion"
+      }
+    });
+    
     return true;
   }
 

@@ -1,4 +1,5 @@
 import mockData from "../mockData/products.json";
+import activityLogService from "./activityLogService";
 
 class ProductService {
   constructor() {
@@ -25,8 +26,26 @@ class ProductService {
       Id: this.getNextId(),
       ...productData,
       createdAt: new Date().toISOString()
-    };
+};
     this.products.push(newProduct);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "CREATE",
+      entityType: "Product",
+      entityId: newProduct.Id,
+      entityName: newProduct.name,
+      description: `Added new product to inventory: ${newProduct.name}`,
+      details: {
+        sku: newProduct.sku,
+        price: newProduct.price,
+        stockLevel: newProduct.stockLevel,
+        category: newProduct.category
+      }
+    });
+    
     return { ...newProduct };
   }
 
@@ -36,24 +55,59 @@ class ProductService {
     if (index === -1) {
       throw new Error("Product not found");
     }
-    
+const oldProduct = { ...this.products[index] };
     this.products[index] = {
       ...this.products[index],
       ...productData,
       Id: parseInt(id)
     };
     
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "UPDATE",
+      entityType: "Product",
+      entityId: parseInt(id),
+      entityName: this.products[index].name,
+      description: `Updated product information for ${this.products[index].name}`,
+      details: {
+        previousPrice: oldProduct.price,
+        newPrice: this.products[index].price,
+        previousStock: oldProduct.stockLevel,
+        newStock: this.products[index].stockLevel
+      }
+    });
+    
     return { ...this.products[index] };
   }
 
   async delete(id) {
     await this.delay();
-    const index = this.products.findIndex(p => p.Id === parseInt(id));
+const index = this.products.findIndex(p => p.Id === parseInt(id));
     if (index === -1) {
       throw new Error("Product not found");
     }
     
+    const deletedProduct = { ...this.products[index] };
     this.products.splice(index, 1);
+    
+    // Log activity
+    activityLogService.logActivity({
+      userId: "user_001",
+      username: "Current User",
+      action: "DELETE",
+      entityType: "Product",
+      entityId: parseInt(id),
+      entityName: deletedProduct.name,
+      description: `Removed product from inventory: ${deletedProduct.name}`,
+      details: {
+        sku: deletedProduct.sku,
+        finalStockLevel: deletedProduct.stockLevel,
+        deletionReason: "User requested deletion"
+      }
+    });
+    
     return true;
   }
 

@@ -1,5 +1,4 @@
 import mockData from "../mockData/transactions.json";
-
 class TransactionService {
   constructor() {
     this.transactions = [...mockData];
@@ -25,9 +24,13 @@ class TransactionService {
       Id: this.getNextId(),
       ...transactionData,
       date: new Date().toISOString(),
-      relatedOrderId: transactionData.relatedOrderId || null
+relatedOrderId: transactionData.relatedOrderId || null
     };
     this.transactions.push(newTransaction);
+    
+    // Log activity
+    await this.logTransactionActivity("CREATE", newTransaction, "Created new transaction");
+    
     return { ...newTransaction };
   }
 
@@ -42,8 +45,10 @@ class TransactionService {
       ...this.transactions[index],
       ...transactionData,
       Id: parseInt(id)
-    };
+};
     
+    // Log activity
+    await this.logTransactionActivity("UPDATE", this.transactions[index], "Updated transaction information");
     return { ...this.transactions[index] };
   }
 
@@ -53,8 +58,14 @@ class TransactionService {
     if (index === -1) {
       throw new Error("Transaction not found");
     }
+}
     
+    const deletedTransaction = { ...this.transactions[index] };
     this.transactions.splice(index, 1);
+    
+    // Log activity
+    await this.logTransactionActivity("DELETE", deletedTransaction, "Deleted transaction record");
+    
     return true;
   }
 
@@ -68,9 +79,10 @@ class TransactionService {
     return this.transactions.filter(t => {
       const transactionDate = new Date(t.date);
       return transactionDate >= new Date(startDate) && transactionDate <= new Date(endDate);
-    });
+});
   }
-async getSummary() {
+
+  async getSummary() {
     await this.delay();
     const income = this.transactions
       .filter(t => t.type === "income")
@@ -151,6 +163,28 @@ async getSummary() {
 
   getNextId() {
     return Math.max(...this.transactions.map(t => t.Id), 0) + 1;
+}
+
+  async logTransactionActivity(action, transaction, description) {
+    try {
+      const activityLogService = (await import('./activityLogService')).default;
+      await activityLogService.logActivity({
+        userId: "user_003",
+        username: "Current User",
+        action,
+        entityType: "Transaction",
+        entityId: transaction.Id,
+        entityName: transaction.description,
+        description,
+        details: {
+          type: transaction.type,
+          category: transaction.category,
+          amount: transaction.amount
+        }
+      });
+    } catch (error) {
+      console.error("Failed to log transaction activity:", error);
+    }
   }
 
   delay(ms = 300) {
