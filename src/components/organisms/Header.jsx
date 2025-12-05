@@ -6,16 +6,6 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-const navigationItems = [
-    { name: "Dashboard", href: "/", icon: "BarChart3" },
-    { name: "Inventory", href: "/inventory", icon: "Package" },
-    { name: "Sales Orders", href: "/sales-orders", icon: "ShoppingCart" },
-    { name: "Purchase Orders", href: "/purchase-orders", icon: "Truck" },
-    { name: "Customers", href: "/customers", icon: "Users" },
-    { name: "Financials", href: "/financials", icon: "DollarSign" },
-    { name: "Journal Entries", href: "/journal-entries", icon: "BookOpen" },
-    { name: "Activity Log", href: "/activity-log", icon: "Activity" }
-  ];
 
 
   return (
@@ -36,74 +26,57 @@ const navigationItems = [
               </h1>
             </div>
           </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex space-x-8">
-            {navigationItems.map((item) => (
-              <NavLink
-                key={item.name}
-                to={item.href}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 px-3 py-2 text-sm font-medium transition-all duration-200 relative ${
-                    isActive
-                      ? "text-primary"
-                      : "text-gray-600 hover:text-primary"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <ApperIcon name={item.icon} className="w-4 h-4" />
-                    {item.name}
-                    {isActive && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-accent"></div>
-                    )}
-                  </>
-                )}
-              </NavLink>
-            ))}
+{/* Navigation - Desktop */}
+          <nav className="hidden md:flex space-x-8">
+            <NavLink
+              to="/dashboard"
+              className={({ isActive }) =>
+                `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-gray-600 hover:text-gray-900"
+                }`
+              }
+            >
+              Dashboard
+            </NavLink>
           </nav>
 
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-          >
-            <ApperIcon 
-              name={isMobileMenuOpen ? "X" : "Menu"} 
-              className="w-6 h-6" 
-            />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 bg-white">
-<div className="px-4 py-2">
-            <nav className="space-y-1">
-              {navigationItems.map((item) => (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-3 text-sm font-medium rounded-md transition-all duration-200 ${
-                      isActive
-                        ? "text-primary bg-primary/5"
-                        : "text-gray-600 hover:text-primary hover:bg-gray-50"
-                    }`
-                  }
-                >
-                  <ApperIcon name={item.icon} className="w-5 h-5" />
-                  {item.name}
-                </NavLink>
-              ))}
-            </nav>
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            >
+              <ApperIcon
+                name={isMobileMenuOpen ? "X" : "Menu"}
+                className="w-6 h-6"
+              />
+            </button>
           </div>
         </div>
-      )}
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`
+                }
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Dashboard
+              </NavLink>
+            </div>
+          </div>
+        )}
+      </div>
     </header>
   );
 };
